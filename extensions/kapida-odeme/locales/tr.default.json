@@ -1,0 +1,32 @@
+{
+  "kapida-odeme": {
+    "name": "Kapıda Ödeme Butonu"
+  },
+  "app-embed": {
+    "name": "Kapıda Ödeme Embed"
+  },
+  "settings": {
+    "backend_url": {
+      "label": "Backend URL",
+      "info": "Next.js backend adresiniz. Örn: https://your-app.vercel.app"
+    },
+    "pixel_id": {
+      "label": "Pixel ID (opsiyonel)"
+    },
+    "button_text": {
+      "label": "Buton Yazısı"
+    },
+    "button_color": {
+      "label": "Buton Rengi"
+    },
+    "button_radius": {
+      "label": "Köşe Yuvarlama"
+    },
+    "margin_top": {
+      "label": "Üst Boşluk"
+    },
+    "margin_bottom": {
+      "label": "Alt Boşluk"
+    }
+  }
+}

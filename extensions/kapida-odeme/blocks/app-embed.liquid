@@ -1,0 +1,105 @@
+{% comment %}
+  App Embed Block — kapida-odeme/blocks/app-embed.liquid
+  Tema editöründe "App embeds" bölümünden açılıp kapatılabilir.
+  Global modal HTML'i ve CSS'i sayfaya enjekte eder.
+  Pixel ID schema ayarından okunur.
+{% endcomment %}
+
+{% if block.settings.pixel_id != blank %}
+  <script>
+    window.KO_PIXEL_ID = {{ block.settings.pixel_id | json }};
+  </script>
+{% endif %}
+
+<script>
+  window.KO_BACKEND_URL = {{ block.settings.backend_url | json }};
+</script>
+
+{{ 'kapida-odeme.css' | asset_url | stylesheet_tag }}
+
+<div id="ko-modal-overlay" style="display:none;" aria-modal="true" role="dialog" aria-label="Kapıda Ödeme Formu">
+  <div id="ko-modal">
+    <button id="ko-close" type="button" aria-label="Kapat">&times;</button>
+
+    <h2 class="ko-title">Kapıda Ödeme Formu</h2>
+
+    <div id="ko-step-1">
+      <div class="ko-field-grid">
+        <div class="ko-field">
+          <label for="ko-fullname">Ad Soyad *</label>
+          <input id="ko-fullname" type="text" placeholder="Ahmet Yılmaz" autocomplete="name" />
+        </div>
+        <div class="ko-field">
+          <label for="ko-phone">Telefon *</label>
+          <input id="ko-phone" type="tel" placeholder="05xx xxx xx xx" maxlength="11" autocomplete="tel" />
+        </div>
+        <div class="ko-field">
+          <label for="ko-city">İl *</label>
+          <input id="ko-city" type="text" placeholder="İstanbul" />
+        </div>
+        <div class="ko-field">
+          <label for="ko-district">İlçe *</label>
+          <input id="ko-district" type="text" placeholder="Kadıköy" />
+        </div>
+        <div class="ko-field ko-field--full">
+          <label for="ko-address">Açık Adres *</label>
+          <textarea id="ko-address" rows="2" placeholder="Mahalle, sokak, bina no, daire no..."></textarea>
+        </div>
+        <div class="ko-field">
+          <label for="ko-qty">Adet *</label>
+          <input id="ko-qty" type="number" value="1" min="1" max="99" />
+        </div>
+      </div>
+      <p id="ko-step1-error" class="ko-error" aria-live="polite"></p>
+      <button id="ko-send-otp-btn" type="button" class="ko-btn-primary">SMS Doğrulama Kodu Gönder</button>
+    </div>
+
+    <div id="ko-step-2" hidden>
+      <p class="ko-info">
+        <strong id="ko-phone-display"></strong> numarasına 6 haneli kod gönderildi.
+      </p>
+      <div class="ko-field">
+        <label for="ko-otp">Doğrulama Kodu *</label>
+        <input id="ko-otp" type="text" inputmode="numeric" maxlength="6" placeholder="123456" class="ko-otp-input" autocomplete="one-time-code" />
+      </div>
+      <p id="ko-step2-error" class="ko-error" aria-live="polite"></p>
+      <button id="ko-verify-btn" type="button" class="ko-btn-primary">Kodu Doğrula ve Siparişi Tamamla</button>
+      <button id="ko-resend-btn" type="button" class="ko-btn-secondary">Kodu Tekrar Gönder</button>
+    </div>
+
+    <div id="ko-step-3" hidden>
+      <div class="ko-success-icon">✓</div>
+      <h3 class="ko-success-title">Siparişiniz Alındı!</h3>
+      <p id="ko-order-info" class="ko-info"></p>
+      <button id="ko-done-btn" type="button" class="ko-btn-primary">Kapat</button>
+    </div>
+
+    <div id="ko-loading" hidden>
+      <div class="ko-spinner"></div>
+    </div>
+  </div>
+</div>
+
+{{ 'kapida-odeme.js' | asset_url | script_tag }}
+
+{% schema %}
+{
+  "name": "Kapıda Ödeme Embed",
+  "target": "body",
+  "settings": [
+    {
+      "type": "text",
+      "id": "backend_url",
+      "label": "Backend URL",
+      "info": "Next.js backend adresiniz. Örn: https://your-app.vercel.app",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "pixel_id",
+      "label": "Pixel ID (opsiyonel)",
+      "info": "Facebook Pixel veya benzeri izleme pikseli ID'si."
+    }
+  ]
+}
+{% endschema %}

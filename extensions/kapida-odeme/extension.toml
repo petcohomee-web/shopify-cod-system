@@ -1,0 +1,6 @@
+api_version = "2024-07"
+
+[[extensions]]
+name = "Kapıda Ödeme"
+handle = "kapida-odeme"
+type = "theme"

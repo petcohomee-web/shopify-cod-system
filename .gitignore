@@ -1,0 +1,4 @@
+.env.local
+.shopify-token.json
+node_modules/
+.next/

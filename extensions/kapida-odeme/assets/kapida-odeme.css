@@ -1,0 +1,195 @@
+/* kapida-odeme.css — Theme App Extension asset */
+
+#ko-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 9998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+#ko-modal-overlay.ko-open {
+  display: flex;
+}
+
+#ko-modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 460px;
+  max-height: 92vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.ko-title {
+  margin: 0 0 20px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+  padding-right: 24px;
+}
+
+#ko-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+  line-height: 1;
+  padding: 0;
+}
+
+#ko-close:hover { color: #111; }
+
+/* Field grid */
+.ko-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ko-field { display: flex; flex-direction: column; gap: 4px; }
+.ko-field--full { grid-column: 1 / -1; }
+
+.ko-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.ko-field input,
+.ko-field textarea,
+.ko-field select {
+  padding: 9px 12px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.ko-field input:focus,
+.ko-field textarea:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.ko-field textarea { resize: vertical; }
+
+.ko-otp-input {
+  font-size: 24px !important;
+  letter-spacing: 8px;
+  text-align: center;
+}
+
+/* Buttons */
+.ko-btn-primary {
+  margin-top: 14px;
+  width: 100%;
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ko-btn-primary:hover  { background: #15803d; }
+.ko-btn-primary:disabled { background: #86efac; cursor: not-allowed; }
+
+.ko-btn-secondary {
+  margin-top: 8px;
+  width: 100%;
+  background: none;
+  border: 1.5px solid #d1d5db;
+  border-radius: 7px;
+  padding: 10px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
+.ko-btn-secondary:hover { border-color: #9ca3af; }
+
+/* Trigger button */
+.ko-trigger-wrapper { width: 100%; }
+
+.ko-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #fff;
+  border: none;
+  padding: 13px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: filter 0.2s;
+}
+
+.ko-trigger-btn:hover { filter: brightness(0.9); }
+
+/* Feedback */
+.ko-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin: 8px 0 0;
+  min-height: 18px;
+}
+
+.ko-info {
+  font-size: 14px;
+  color: #374151;
+  margin: 0 0 14px;
+}
+
+.ko-success-icon {
+  font-size: 52px;
+  color: #16a34a;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.ko-success-title {
+  color: #16a34a;
+  text-align: center;
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+
+/* Spinner */
+#ko-loading { text-align: center; padding: 24px 0; }
+
+.ko-spinner {
+  display: inline-block;
+  width: 34px;
+  height: 34px;
+  border: 3px solid #d1d5db;
+  border-top-color: #16a34a;
+  border-radius: 50%;
+  animation: ko-spin 0.75s linear infinite;
+}
+
+@keyframes ko-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  .ko-field-grid { grid-template-columns: 1fr; }
+  #ko-modal { padding: 20px 16px; }
+}

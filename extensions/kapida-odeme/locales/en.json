@@ -1,0 +1,32 @@
+{
+  "kapida-odeme": {
+    "name": "Cash on Delivery Button"
+  },
+  "app-embed": {
+    "name": "Cash on Delivery Embed"
+  },
+  "settings": {
+    "backend_url": {
+      "label": "Backend URL",
+      "info": "Your Next.js backend address. E.g.: https://your-app.vercel.app"
+    },
+    "pixel_id": {
+      "label": "Pixel ID (optional)"
+    },
+    "button_text": {
+      "label": "Button Text"
+    },
+    "button_color": {
+      "label": "Button Color"
+    },
+    "button_radius": {
+      "label": "Corner Radius"
+    },
+    "margin_top": {
+      "label": "Top Margin"
+    },
+    "margin_bottom": {
+      "label": "Bottom Margin"
+    }
+  }
+}
