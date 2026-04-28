@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 const phoneCache = new Map<string, number>();
 
 const corsHeaders = {
@@ -6,6 +8,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
+function hash(value: string) {
+  return crypto.createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
+}
+
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: corsHeaders });
 }
@@ -13,18 +19,12 @@ export async function OPTIONS() {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-
     const now = Date.now();
 
     let phone = String(data.phone || "").replace(/\D/g, "");
 
-    if (phone.startsWith("0")) {
-      phone = "90" + phone.slice(1);
-    }
-
-    if (!phone.startsWith("90")) {
-      phone = "90" + phone;
-    }
+    if (phone.startsWith("0")) phone = "90" + phone.slice(1);
+    if (!phone.startsWith("90")) phone = "90" + phone;
 
     phone = "+" + phone;
 
@@ -54,15 +54,11 @@ Adres: ${data.address}
 Telefon: ${phone}
 `;
 
-    console.log("SİPARİŞ GELDİ:", data);
-
     const tokenRes = await fetch(
       `https://${process.env.SHOPIFY_STORE}/admin/oauth/access_token`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           client_id: process.env.SHOPIFY_CLIENT_ID,
           client_secret: process.env.SHOPIFY_CLIENT_SECRET,
@@ -116,8 +112,6 @@ Telefon: ${phone}
 
     const orderData = await orderRes.json();
 
-    console.log("SHOPIFY RESPONSE:", orderData);
-
     if (!orderRes.ok) {
       return Response.json(
         { success: false, error: orderData },
@@ -126,6 +120,50 @@ Telefon: ${phone}
     }
 
     phoneCache.set(phone, now);
+
+    // Meta CAPI Purchase
+    try {
+      if (process.env.META_PIXEL_ID && process.env.META_ACCESS_TOKEN) {
+        await fetch(
+          `https://graph.facebook.com/v19.0/${process.env.META_PIXEL_ID}/events?access_token=${process.env.META_ACCESS_TOKEN}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              data: [
+                {
+                  event_name: "Purchase",
+                  event_time: Math.floor(Date.now() / 1000),
+                  action_source: "website",
+                  event_source_url: "https://movika.co/",
+                  user_data: {
+                    ph: [hash(phone.replace(/\D/g, ""))],
+                    fn: firstName ? [hash(firstName)] : undefined,
+                    ln: lastName !== "-" ? [hash(lastName)] : undefined,
+                    ct: data.city ? [hash(String(data.city))] : undefined,
+                    country: [hash("tr")],
+                  },
+                  custom_data: {
+                    currency: "TRY",
+                    value: 999.99,
+                    order_id: String(orderData?.order?.id || ""),
+                    content_type: "product",
+                    contents: [
+                      {
+                        id: String(data.variantId),
+                        quantity: Number(data.quantity) || 1,
+                      },
+                    ],
+                  },
+                },
+              ],
+            }),
+          }
+        );
+      }
+    } catch (metaError) {
+      console.error("META CAPI HATA:", metaError);
+    }
 
     return Response.json(
       { success: true, order: orderData },

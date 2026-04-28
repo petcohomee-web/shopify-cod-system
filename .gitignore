@@ -2,3 +2,5 @@
 .shopify-token.json
 node_modules/
 .next/
+.vercel
+.env*.local
