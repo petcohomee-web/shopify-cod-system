@@ -13,22 +13,17 @@ export async function OPTIONS() {
 
 export async function POST(req: Request) {
   try {
-    const { code } = await req.json();
+    const data = await req.json();
 
-    if (code !== "1234") {
-      return Response.json(
-        { success: false, error: "Kod yanlış" },
-        { status: 400, headers: corsHeaders }
-      );
-    }
+    console.log("ORDER GELDİ:", data);
 
     return Response.json(
-      { success: true, verified: true },
+      { success: true, message: "Sipariş alındı", data },
       { status: 200, headers: corsHeaders }
     );
   } catch {
     return Response.json(
-      { success: false, error: "Doğrulama başarısız" },
+      { success: false, error: "Sipariş oluşturulamadı" },
       { status: 500, headers: corsHeaders }
     );
   }
