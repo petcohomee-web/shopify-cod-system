@@ -1,4 +1,5 @@
 const phoneCache = new Map<string, number>();
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -12,18 +13,8 @@ export async function OPTIONS() {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const now = Date.now();
-const lastOrderTime = phoneCache.get(phone);
 
-if (lastOrderTime && now - lastOrderTime < 10 * 60 * 1000) {
-  return Response.json(
-    {
-      success: false,
-      error: "Bu numara ile kısa süre içinde tekrar sipariş verilemez."
-    },
-    { status: 400, headers: corsHeaders }
-  );
-}
+    const now = Date.now();
 
     let phone = String(data.phone || "").replace(/\D/g, "");
 
@@ -36,6 +27,18 @@ if (lastOrderTime && now - lastOrderTime < 10 * 60 * 1000) {
     }
 
     phone = "+" + phone;
+
+    const lastOrderTime = phoneCache.get(phone);
+
+    if (lastOrderTime && now - lastOrderTime < 10 * 60 * 1000) {
+      return Response.json(
+        {
+          success: false,
+          error: "Bu numara ile kısa süre içinde tekrar sipariş verilemez.",
+        },
+        { status: 400, headers: corsHeaders }
+      );
+    }
 
     const fullName = String(data.fullName || "").trim();
     const nameParts = fullName.split(" ");
@@ -98,7 +101,7 @@ Telefon: ${phone}
               first_name: firstName,
               last_name: lastName,
               name: fullName,
-              phone: phone,
+              phone,
               address1: data.address,
               city: data.city,
               country: "Turkey",
@@ -121,7 +124,9 @@ Telefon: ${phone}
         { status: 500, headers: corsHeaders }
       );
     }
-phoneCache.set(phone, now);
+
+    phoneCache.set(phone, now);
+
     return Response.json(
       { success: true, order: orderData },
       { status: 200, headers: corsHeaders }
