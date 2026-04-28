@@ -12,9 +12,34 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
 
+    let phone = String(data.phone || "").replace(/\D/g, "");
+
+    if (phone.startsWith("0")) {
+      phone = "90" + phone.slice(1);
+    }
+
+    if (!phone.startsWith("90")) {
+      phone = "90" + phone;
+    }
+
+    phone = "+" + phone;
+
+    const fullName = String(data.fullName || "").trim();
+    const nameParts = fullName.split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "-";
+
+    const noteText = `
+Kapıda ödeme siparişi
+
+İl: ${data.city}
+İlçe: ${data.district}
+Adres: ${data.address}
+Telefon: ${phone}
+`;
+
     console.log("SİPARİŞ GELDİ:", data);
 
-    // 🔥 1. TOKEN AL (CLIENT ID + SECRET)
     const tokenRes = await fetch(
       `https://${process.env.SHOPIFY_STORE}/admin/oauth/access_token`,
       {
@@ -33,16 +58,13 @@ export async function POST(req: Request) {
     const tokenData = await tokenRes.json();
     const accessToken = tokenData.access_token;
 
-    console.log("TOKEN:", accessToken);
-
     if (!accessToken) {
       return Response.json(
-        { success: false, error: "Token alınamadı" },
+        { success: false, error: "Token alınamadı", details: tokenData },
         { status: 500, headers: corsHeaders }
       );
     }
 
-    // 🔥 2. SHOPIFY SİPARİŞ OLUŞTUR
     const orderRes = await fetch(
       `https://${process.env.SHOPIFY_STORE}/admin/api/2024-01/orders.json`,
       {
@@ -56,22 +78,26 @@ export async function POST(req: Request) {
             line_items: [
               {
                 variant_id: data.variantId,
-                quantity: data.quantity,
+                quantity: Number(data.quantity) || 1,
               },
             ],
             customer: {
-              first_name: data.fullName,
-              phone: data.phone,
+              first_name: firstName,
+              last_name: lastName,
+              phone: phone,
             },
             shipping_address: {
-              name: data.fullName,
-              phone: data.phone,
+              first_name: firstName,
+              last_name: lastName,
+              name: fullName,
+              phone: phone,
               address1: data.address,
               city: data.city,
               country: "Turkey",
             },
             financial_status: "pending",
-            note: "Kapıda ödeme siparişi",
+            note: noteText,
+            tags: "Kapıda Ödeme",
           },
         }),
       }
@@ -92,7 +118,6 @@ export async function POST(req: Request) {
       { success: true, order: orderData },
       { status: 200, headers: corsHeaders }
     );
-
   } catch (error) {
     console.error("HATA:", error);
 
