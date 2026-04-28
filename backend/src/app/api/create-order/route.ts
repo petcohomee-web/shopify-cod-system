@@ -14,12 +14,41 @@ export async function POST(req: Request) {
 
     console.log("SİPARİŞ GELDİ:", data);
 
-    const response = await fetch(
+    // 🔥 1. TOKEN AL (CLIENT ID + SECRET)
+    const tokenRes = await fetch(
+      `https://${process.env.SHOPIFY_STORE}/admin/oauth/access_token`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          client_id: process.env.SHOPIFY_CLIENT_ID,
+          client_secret: process.env.SHOPIFY_CLIENT_SECRET,
+          grant_type: "client_credentials",
+        }),
+      }
+    );
+
+    const tokenData = await tokenRes.json();
+    const accessToken = tokenData.access_token;
+
+    console.log("TOKEN:", accessToken);
+
+    if (!accessToken) {
+      return Response.json(
+        { success: false, error: "Token alınamadı" },
+        { status: 500, headers: corsHeaders }
+      );
+    }
+
+    // 🔥 2. SHOPIFY SİPARİŞ OLUŞTUR
+    const orderRes = await fetch(
       `https://${process.env.SHOPIFY_STORE}/admin/api/2024-01/orders.json`,
       {
         method: "POST",
         headers: {
-          "X-Shopify-Access-Token": process.env.SHOPIFY_ADMIN_ACCESS_TOKEN!,
+          "X-Shopify-Access-Token": accessToken,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -48,19 +77,19 @@ export async function POST(req: Request) {
       }
     );
 
-    const result = await response.json();
+    const orderData = await orderRes.json();
 
-    console.log("SHOPIFY RESPONSE:", result);
+    console.log("SHOPIFY RESPONSE:", orderData);
 
-    if (!response.ok) {
+    if (!orderRes.ok) {
       return Response.json(
-        { success: false, error: result },
+        { success: false, error: orderData },
         { status: 500, headers: corsHeaders }
       );
     }
 
     return Response.json(
-      { success: true, order: result },
+      { success: true, order: orderData },
       { status: 200, headers: corsHeaders }
     );
 
