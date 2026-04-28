@@ -5,26 +5,15 @@ const corsHeaders = {
 };
 
 export async function OPTIONS() {
-  return new Response(null, {
-    status: 204,
-    headers: corsHeaders,
-  });
+  return new Response(null, { status: 204, headers: corsHeaders });
 }
 
 export async function POST(req: Request) {
-  try {
-    const data = await req.json();
+  const { code } = await req.json();
 
-    console.log("ORDER GELDİ:", data);
-
-    return Response.json(
-      { success: true, message: "Sipariş alındı", data },
-      { status: 200, headers: corsHeaders }
-    );
-  } catch {
-    return Response.json(
-      { success: false, error: "Sipariş oluşturulamadı" },
-      { status: 500, headers: corsHeaders }
-    );
+  if (code !== "1234") {
+    return Response.json({ success: false }, { status: 400, headers: corsHeaders });
   }
+
+  return Response.json({ success: true }, { status: 200, headers: corsHeaders });
 }
