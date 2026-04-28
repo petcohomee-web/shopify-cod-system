@@ -81,11 +81,6 @@ Telefon: ${phone}
                 quantity: Number(data.quantity) || 1,
               },
             ],
-            customer: {
-              first_name: firstName,
-              last_name: lastName,
-              phone: phone,
-            },
             shipping_address: {
               first_name: firstName,
               last_name: lastName,
