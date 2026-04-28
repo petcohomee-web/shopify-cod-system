@@ -1,7 +1,30 @@
+import { NextResponse } from "next/server";
+import { neon } from "@neondatabase/serverless";
+
+const sql = neon(process.env.DATABASE_URL!);
+
 export async function POST(req: Request) {
-  const data = await req.json();
+  const body = await req.json();
+  const { fee, upsell, sms } = body;
 
-  console.log("GELEN AYARLAR:", data);
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS settings (
+        id SERIAL PRIMARY KEY,
+        fee TEXT,
+        upsell TEXT,
+        sms TEXT
+      );
+    `;
 
-  return Response.json({ success: true });
+    await sql`
+      INSERT INTO settings (fee, upsell, sms)
+      VALUES (${fee}, ${upsell}, ${sms});
+    `;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "DB error" }, { status: 500 });
+  }
 }
