@@ -60,7 +60,23 @@ export default function Page() {
       </div>
 
       <button
-        onClick={saveSettings}
+        onClick={async () => {
+  await saveSettings();
+
+  await fetch("https://shopify-cod-system.vercel.app/api/save-settings", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      fee: codFee,
+      upsell,
+      sms,
+    }),
+  });
+
+  alert("Gerçekten kaydedildi 🚀");
+}}
         style={{
           marginTop: "30px",
           padding: "10px 20px",
