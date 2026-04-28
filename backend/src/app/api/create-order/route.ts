@@ -60,6 +60,8 @@ Telefon: ${phone}
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+  test_event_code: "TEST73658",
+  data: [
           client_id: process.env.SHOPIFY_CLIENT_ID,
           client_secret: process.env.SHOPIFY_CLIENT_SECRET,
           grant_type: "client_credentials",
