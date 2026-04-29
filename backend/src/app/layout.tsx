@@ -5,7 +5,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body style={{ margin: 0 }}>
+      <body>
         {children}
       </body>
     </html>
