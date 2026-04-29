@@ -28,3 +28,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "DB error" }, { status: 500 });
   }
 }
+import { NextResponse } from "next/server";
+import { sql } from "@neondatabase/serverless";
+
+// 👇 EKLE
+export async function GET() {
+  try {
+    const result = await sql`SELECT * FROM settings LIMIT 1`;
+
+    return NextResponse.json({
+      success: true,
+      data: result[0] || null,
+    });
+  } catch (err) {
+    return NextResponse.json(
+      { success: false, error: "db error" },
+      { status: 500 }
+    );
+  }
+}
