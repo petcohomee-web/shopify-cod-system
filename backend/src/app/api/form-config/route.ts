@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
     await sql`
       INSERT INTO form_config (language, fields, design)
-      VALUES (${language}, ${fields}, ${design});
+      VALUES (${language}, ${JSON.stringify(fields)}, ${JSON.stringify(design)});
     `;
 
     return NextResponse.json({ success: true });
