@@ -1,4 +1,19 @@
 export default function FormDesignerPage() {
+  const [config, setConfig] = useState<any>(null);
+
+  useEffect(() => {
+    fetch("/api/form-config")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("CONFIG:", data);
+        setConfig(data);
+      });
+  }, []);
+
+  if (!config) {
+    return <div style={{ padding: 30 }}>Yükleniyor...</div>;
+  }
+
   return (
     <main style={{ padding: 32, fontFamily: "Arial, sans-serif" }}>
       <h1 style={{ fontSize: 28, marginBottom: 8 }}>Form Tasarımcısı</h1>
