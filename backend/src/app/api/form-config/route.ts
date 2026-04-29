@@ -15,10 +15,16 @@ export async function GET() {
       );
     `;
 
-    return NextResponse.json({
-      success: true,
-      message: "Form config table hazır",
-    });
+    const result = await sql`
+  SELECT * FROM form_config
+  ORDER BY id DESC
+  LIMIT 1;
+`;
+
+return NextResponse.json({
+  success: true,
+  data: result[0] || null,
+});
   } catch (error) {
     console.error(error);
     return NextResponse.json(
