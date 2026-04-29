@@ -1,3 +1,6 @@
+"use client";
+import { useEffect, useState } from "react";
+
 export default function FormDesignerPage() {
   const [config, setConfig] = useState<any>(null);
 
