@@ -3,92 +3,36 @@
 import { useEffect, useState } from "react";
 
 export default function Page() {
-  const [codFee, setCodFee] = useState("0");
-  const [upsell, setUpsell] = useState("Evet");
-  const [sms, setSms] = useState("Kapalı");
-  const [saved, setSaved] = useState("");
+  const [config, setConfig] = useState<any>(null);
 
   useEffect(() => {
-    setCodFee(localStorage.getItem("codFee") || "0");
-    setUpsell(localStorage.getItem("upsell") || "Evet");
-    setSms(localStorage.getItem("sms") || "Kapalı");
+    fetch("/api/form-config")
+      .then(res => res.json())
+      .then(data => {
+        setConfig(data.data);
+      });
   }, []);
 
-  function saveSettings() {
-    localStorage.setItem("codFee", codFee);
-    localStorage.setItem("upsell", upsell);
-    localStorage.setItem("sms", sms);
-    setSaved("✅ Ayarlar kaydedildi");
-  }
+  if (!config) return <div>Yükleniyor...</div>;
 
   return (
-    <div style={{ padding: "40px", fontFamily: "Arial" }}>
-      <h1>Movika COD App Panel</h1>
+    <div style={{ padding: 20 }}>
+      <h2>Kapıda Ödeme Formu</h2>
 
-      <div style={{ marginTop: "20px" }}>
-        <label>Kapıda Ödeme Ücreti (TL)</label>
-        <input
-          type="number"
-          value={codFee}
-          onChange={(e) => setCodFee(e.target.value)}
-          style={{ display: "block", marginTop: "5px" }}
-        />
-      </div>
+      {config.fields.map((field: any, i: number) => (
+        <div key={i} style={{ marginBottom: 10 }}>
+          <label>{field.label}</label>
+          <input
+            type={field.type}
+            required={field.required}
+            style={{ display: "block", width: "100%", padding: 8 }}
+          />
+        </div>
+      ))}
 
-      <div style={{ marginTop: "20px" }}>
-        <label>Upsell Aktif</label>
-        <select
-          value={upsell}
-          onChange={(e) => setUpsell(e.target.value)}
-          style={{ display: "block", marginTop: "5px" }}
-        >
-          <option>Evet</option>
-          <option>Hayır</option>
-        </select>
-      </div>
-
-      <div style={{ marginTop: "20px" }}>
-        <label>SMS Doğrulama</label>
-        <select
-          value={sms}
-          onChange={(e) => setSms(e.target.value)}
-          style={{ display: "block", marginTop: "5px" }}
-        >
-          <option>Kapalı</option>
-          <option>Açık</option>
-        </select>
-      </div>
-
-      <button
-        onClick={async () => {
-  await saveSettings();
-
-  await fetch("https://shopify-cod-system.vercel.app/api/save-settings", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      fee: codFee,
-      upsell,
-      sms,
-    }),
-  });
-
-  alert("Gerçekten kaydedildi 🚀");
-}}
-        style={{
-          marginTop: "30px",
-          padding: "10px 20px",
-          background: "black",
-          color: "white",
-          borderRadius: "8px",
-        }}
-      >
-        Kaydet
+      <button style={{ padding: 10, marginTop: 20 }}>
+        {config.design.buttonText}
       </button>
-
-      <p>{saved}</p>
     </div>
   );
 }
